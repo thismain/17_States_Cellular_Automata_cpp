@@ -34,7 +34,7 @@ string pather="/var/www/html/states/";
 
 SDL_Window* gWindow = NULL;
 SDL_Renderer* gRenderer = NULL;
-const int cellSize=6;//changing this value will affect checkDensity function
+const int cellSize=5;//changing this value will affect checkDensity function
 //checkDensity values need to be made dependent upon screen_width/height values
 //so can change cellSize without affecting large rectangles
 const int SCREEN_WIDTH=1364-(1364%cellSize); //1280, 1364
@@ -69,7 +69,7 @@ const int stateColor[numStates][3]={
 };
 
 bool useRandColor=false;
-int randColor[numStates][3]={};
+int randColor[numStates][3];
 int delayer=50;
 int shiftX=0;
 int shiftY=0;
@@ -752,7 +752,7 @@ for(int c=0;c<numDots;c++){
 if(dot[c].state>0){ 
 dot[c].drawDot(x,y);
 
-if(checkDensity){ //count large rectangles which contain minDots of dots with any state>0, if cellSize=5, number of large rects will be 60
+if(checkDensity){ //count large rectangles which contain minDots of dots with any state>0, if cellSize=6, number of large rects will be 60
 
 largeRectBoolCounter[dot[c].largeRectId]++;
 if(largeRectBoolCounter[dot[c].largeRectId]>minDots){
