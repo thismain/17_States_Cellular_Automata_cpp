@@ -614,7 +614,7 @@ case SDLK_h:
 ruleFni++; if((unsigned int)ruleFni>ruleFn.size()-1){ruleFni=0;}
 loadRule(ruleFni); setState(); 
 break;
-case SDLK_SPACE: renderShiftX=0; renderShiftY=0;break;
+case SDLK_SPACE: renderShiftX=0; renderShiftY=0; rendScale=1;break;
 case SDLK_SEMICOLON: showGrid=!showGrid; break;
 case SDLK_QUOTE:if(altKey){dense+=1;}else{dense-=1;}break;
 case SDLK_RETURN:break;
@@ -1408,7 +1408,7 @@ string helpTextArray[27]={
 "D: toggle display of important variables",
 "V: check if current rule is new or is saved already",
 "E: display key shortcuts help",
-"Left Mouse Button and Wheel for panning and zooming"
+"Left Mouse Button and Wheel for panning and zooming, spacebar resets"
 };
 
 void displayHelpText(){
