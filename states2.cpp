@@ -34,7 +34,7 @@ string pather="/var/www/html/states/";
 
 SDL_Window* gWindow = NULL;
 SDL_Renderer* gRenderer = NULL;
-const int cellSize=5;//changing this value will affect checkDensity function
+const int cellSize=6;//changing this value will affect checkDensity function
 //checkDensity values need to be made dependent upon screen_width/height values
 //so can change cellSize without affecting large rectangles
 const int SCREEN_WIDTH=1364-(1364%cellSize); //1280, 1364
@@ -270,8 +270,10 @@ setState();
 for(int i=0;i<numStates;i++){
 for(int n=0;n<numStates;n++){
 //birth count: number of neighbors of a particular state required for cell to be born into newState; min value must be 1, or else get siezure inducing flashing; max value must be higher than 8, or else cells grow too fast; if max is too high, cells do not live long enough for forms to emerge;
+//setting the deathNeighsMax value above the value which could actually occur works to limit the number of cells whose birth rules evaluate to true
 birthCount[i][n]=rander(1,birthNeighsMax);
-//death count: number of neighbors of a particular state required for a cell to change to state 0 (die); min value must be 0
+//death count: number of neighbors of a particular state required for a cell to change to state 0 (die);
+//setting the deathNeighsMax value above the value which could actually occur works to limit the number of cells whose death rules evaluate to true
 deathCount[i][n]=rander(0,deathNeighsMax);
 
 //new state is one of 16 values between 1 and 16 inclusive
@@ -351,6 +353,7 @@ for(int n=1;n<numStates;n++){
 //if(dot[c].state==n){ //for painting, because cells will persist in alive states
 if(nScount[i]>=deathCount[i][n]){ 
 dCount++;
+//try different comparison operators, for different results, but saved rules will not show the same effects which caused you to save them; could add variables to the saved rule files called deathOperator and birthOperator, then use a conditional here to choose which operator to use for a particular rule, and display the operator in use in the important variables; my saved rules for now are using the >= than operator for death, and > for birth
 if(dCount>=dCondsMatch){dot[c].stateTemp=0; goto nextDot;}
 }//end nScount>=
 //}//if state==n
@@ -360,7 +363,8 @@ if(dCount>=dCondsMatch){dot[c].stateTemp=0; goto nextDot;}
 
 nextDot:;
 
-if(dot[c].state>0&&dot[c].stateTemp>0){cout<<dot[c].id; pauser=true;}
+//uncommenting this line results in all cells dying at each step, so only birth rules apply, which is good for clearing the space for the unimpeded evolution of moving 'forms'
+//if(dot[c].state>0&&dot[c].stateTemp>0){cout<<dot[c].id; pauser=true;}
 
 
 }//all dots loop
@@ -610,7 +614,7 @@ case SDLK_h:
 ruleFni++; if((unsigned int)ruleFni>ruleFn.size()-1){ruleFni=0;}
 loadRule(ruleFni); setState(); 
 break;
-
+case SDLK_SPACE: renderShiftX=0; renderShiftY=0;break;
 case SDLK_SEMICOLON: showGrid=!showGrid; break;
 case SDLK_QUOTE:if(altKey){dense+=1;}else{dense-=1;}break;
 case SDLK_RETURN:break;
