@@ -125,9 +125,9 @@ int deathCount[numStates][numStates];
 int newState[numStates][numStates];
 
 int birthNeighsMax=16;
-int deathNeighsMax=2;
+int deathNeighsMax=8;
 int bCondsMatch=1;
-int dCondsMatch=0;
+int dCondsMatch=5;
 
 vector<string>stateFn;
 int stateFni=0;
@@ -364,7 +364,7 @@ if(dCount>=dCondsMatch){dot[c].stateTemp=0; goto nextDot;}
 nextDot:;
 
 //uncommenting this line results in all cells dying at each step, so only birth rules apply, which is good for clearing the space for the unimpeded evolution of moving 'forms'
-//if(dot[c].state>0&&dot[c].stateTemp>0){cout<<dot[c].id; pauser=true;}
+//if(dot[c].state>0&&dot[c].stateTemp>0){ dot[c].stateTemp=0; pauser=true;}
 
 
 }//all dots loop
