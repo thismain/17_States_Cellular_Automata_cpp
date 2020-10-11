@@ -34,7 +34,7 @@ string pather="/var/www/html/states/";
 
 SDL_Window* gWindow = NULL;
 SDL_Renderer* gRenderer = NULL;
-const int cellSize=6;//changing this value will affect checkDensity function
+const int cellSize=5;//changing this value will affect checkDensity function
 //checkDensity values need to be made dependent upon screen_width/height values
 //so can change cellSize without affecting large rectangles
 const int SCREEN_WIDTH=1364-(1364%cellSize); //1280, 1364
@@ -125,9 +125,9 @@ int deathCount[numStates][numStates];
 int newState[numStates][numStates];
 
 int birthNeighsMax=16;
-int deathNeighsMax=8;
+int deathNeighsMax=2;
 int bCondsMatch=1;
-int dCondsMatch=5;
+int dCondsMatch=0;
 
 vector<string>stateFn;
 int stateFni=0;
@@ -136,6 +136,7 @@ vector<string>XYStateFn;
 int XYStateFni=0;
 
 int interest=0;
+//these filename index changes as rules are deleted, so only temporarily interesting, would be better to save the filename, and load based on that; search filenames, get index, load
 int interesting[]={1289,818,1356,313,1313,1887};
 int startingRule=0; //set to 0 for starting with random rule
 int ruleFni=startingRule;
@@ -518,6 +519,9 @@ SDL_RenderSetScale(gRenderer,rendScale,rendScale);
 
 
 if(e.type == SDL_MOUSEBUTTONDOWN){
+if(e.button.button == SDL_BUTTON_MIDDLE){
+setRuleValues();
+}
 
 if(e.button.button == SDL_BUTTON_RIGHT){
 renderShiftX=renderShiftXLast=0;
@@ -578,7 +582,7 @@ case SDLK_n: SDL_SetWindowFullscreen(gWindow,SDL_WINDOW_SHOWN); break;
 case SDLK_b: saveScreenshotPNG();break;
 case SDLK_r: setRuleValues(); break;
 case SDLK_s: setState(); break;
-case SDLK_p: pauser=!pauser; if(!pauser){drawMode=false;}break;
+case SDLK_p: pauser=!pauser; if(!pauser){drawMode=false;stepMode=false;}break;
 case SDLK_c:
 if(altKey){deleteRule();}//else{deleteAllDupRuleFiles();}
 break;
@@ -602,8 +606,8 @@ loadRule(ruleFni);setState();
 
 break;
 case SDLK_x: break;
-case SDLK_a: stepMode=!stepMode; pauser=stepMode; break;
-case SDLK_q: if(stepMode){stepOnce=1;} break;
+case SDLK_a: stepMode=false; pauser=false; break;
+case SDLK_q: pauser=true;stepMode=true;stepOnce=1; break;
 case SDLK_f: 
 saveRule(); ruleFnis=ruleFni; readRuleFilenames(); ruleFni=ruleFnis;
  break;
@@ -623,7 +627,10 @@ loadRule(interesting[interest]); setState();
 ruleFni=interesting[interest];
 interest++; if(interest>sizeof(interesting)/sizeof(interesting[0])-1){interest=0;}
 break;
-case SDLK_PERIOD:randomColorFunction();useRandColor=true;break;
+case SDLK_PERIOD:
+if(altKey){useRandColor=false;}else{
+randomColorFunction();useRandColor=true;}
+break;
 case SDLK_j: 
 if((unsigned int)ruleFni>0){ruleFni--;}else{ruleFni=ruleFn.size()-1;}
 loadRule(ruleFni); setState(); 
@@ -1306,7 +1313,7 @@ void saveScreenshotPNG(){
 vector<string>imNames;
 DIR *dir;
 struct dirent *ent;
-dir = opendir ("/var/www/html/p/s/");
+dir = opendir ("/var/www/html/p/d/");
 int i=0;//for passing over dot, dot dot
 while ((ent = readdir (dir)) != NULL){ i++; if(i>=3){
 imNames.push_back(ent->d_name);
@@ -1315,7 +1322,7 @@ closedir(dir);
 //cout<<endl <<imNames.size()<<endl;
 
 //build image path and file name as const char*
-string imName="/var/www/html/p/s/0";
+string imName="/var/www/html/p/d/0";
 imName+=to_string((long long)(imNames.size()));
 imName+=".png";
 
@@ -1401,14 +1408,14 @@ string helpTextArray[27]={
 "I: increase bCondsMatch; Z+I to decrease",
 "O: increase dCondsMatch; Z+O to decrease",
 "L: toggling auto restart mode for automatically setting new rule, conditionally",
-"A: toggle stepMode",
+"Period: random colors; Z+Period: reset to default colors",
 "Q: step once",
 //"Z+C: delete all duplicate rule files",
 "Z+C: delete current rule file",
 "D: toggle display of important variables",
 "V: check if current rule is new or is saved already",
 "E: display key shortcuts help",
-"Left Mouse Button and Wheel for panning and zooming, spacebar resets"
+"Left Mouse Button and Wheel for pan and zoom, right mouse button, or spacebar resets"
 };
 
 void displayHelpText(){
@@ -1457,6 +1464,9 @@ min = (randColor[i][0] < randColor[i][notmax]) ? 0 : notmax;
 }
 randColor[i][max]=255;
 randColor[i][min]=0;
+
+//one state white, same state, 7, that is one in default colors
+if(i==7){for(int j=0;j<3;j++){randColor[i][j]=255;}}
 }//end numstates loop
 }//end random color function
 
